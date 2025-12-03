@@ -41,3 +41,63 @@ class LeafNode(Node):
     def __init__(self, name: str, value: any):
         super().__init__(name)
         self.value = value
+
+
+class BuilderState(ABC):
+    """
+    Define a interface comum para todos os estados de construção.
+    """
+    @abstractmethod
+    def execute(self, builder, node: Node):
+        pass
+
+
+class TreeBuilder:
+    """
+    Gerencia o estado atual da construção e executa ações nos nós.
+    """
+    def __init__(self):
+        self._state = SplittingState()
+
+    def set_state(self, state: BuilderState):
+        """
+        Permite a transição de estados (ex: de Splitting para Stopping).
+        """
+        print(f"Transição de Estado: {type(self._state).__name__} -> {type(state).__name__}")
+        self._state = state
+
+    def process_node(self, node: Node):
+        """
+        Delega a ação para o estado atual.
+        """
+        self._state.execute(self, node)
+
+
+class SplittingState(BuilderState):
+    """
+    Simula a lógica de encontrar a melhor divisão (split) para um nó.
+    """
+    def execute(self, builder, node: Node):
+        print(f"Calculando ganho de informação para o nó '{node.name}'...")
+        if isinstance(node, DecisionNode):
+            print(f"O nó '{node.name}' está pronto para receber filhos.")
+        else:
+            print(f"O nó '{node.name}' é uma folha e não pode ser dividido.")
+
+
+class StoppingState(BuilderState):
+    """
+    Simula a verificação de critérios de parada (ex: profundidade máxima).
+    """
+    def execute(self, builder, node: Node):
+        print(f"Verificando critérios de parada para '{node.name}'...")
+        print("Critério atingido. Este ramo não crescerá mais.")
+
+
+class PruningState(BuilderState):
+    """
+    Simula a remoção de nós para evitar overfitting.
+    """
+    def execute(self, builder, node: Node):
+        print(f"Avaliando complexidade do nó '{node.name}'...")
+        print("Poda simulada: Reduzindo ramos desnecessários.")
