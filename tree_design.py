@@ -34,7 +34,7 @@ class DecisionNode(Node):
         print(f"Nó '{child.name}' adicionado ao pai '{self.name}'.")
 
     def accept(self, visitor):
-        visitor.visit_decision_node(self)
+        return visitor.visit_decision_node(self)
 
 
 class LeafNode(Node):
@@ -46,7 +46,7 @@ class LeafNode(Node):
         self.value = value
 
     def accept(self, visitor):
-        visitor.visit_leaf_node(self)
+        return visitor.visit_leaf_node(self)
 
 
 class BuilderState(ABC):
