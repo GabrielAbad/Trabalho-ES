@@ -101,3 +101,58 @@ class PruningState(BuilderState):
     def execute(self, builder, node: Node):
         print(f"Avaliando complexidade do nó '{node.name}'...")
         print("Poda simulada: Reduzindo ramos desnecessários.")
+
+
+class TreeIterator(ABC):
+    """
+    Define a interface para os iteradores.
+    """
+    @abstractmethod
+    def has_next(self):
+        pass
+
+    @abstractmethod
+    def next(self):
+        pass
+
+
+class PreOrderIterator(TreeIterator):
+    """
+    Percorre a árvore em ordem Pré-Ordem (Raiz, Esquerda, Direita).
+    Utiliza uma pilha (stack) para gerenciar os nós a serem visitados.
+    """
+    def __init__(self, root: Node):
+        self._stack = []
+        if root:
+            # Inicializa a pilha com a raiz
+            self._stack.append(root)
+
+    def has_next(self):
+        """
+        Verifica se ainda há nós a serem visitados.
+        """
+        return bool(self._stack)
+
+    def next(self):
+        """
+        Retorna o próximo nó na sequência Pré-Ordem.
+        """
+        if not self.has_next():
+            raise StopIteration("Não há mais nós na árvore.")
+
+        node = self._stack.pop()
+        
+        print(f"Visitando nó: {node.name}")
+        if isinstance(node, DecisionNode):
+            for child in reversed(node.children):
+                self._stack.append(child)
+        
+        return node
+
+def get_pre_order_iterator(self):
+    """
+    Retorna uma instância do nosso iterador.
+    """
+    return PreOrderIterator(self)
+
+Node.get_pre_order_iterator = get_pre_order_iterator
