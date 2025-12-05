@@ -33,6 +33,9 @@ class DecisionNode(Node):
         self.children.append(child)
         print(f"Nó '{child.name}' adicionado ao pai '{self.name}'.")
 
+    def accept(self, visitor):
+        visitor.visit_decision_node(self)
+
 
 class LeafNode(Node):
     """
@@ -41,6 +44,9 @@ class LeafNode(Node):
     def __init__(self, name: str, value: any):
         super().__init__(name)
         self.value = value
+
+    def accept(self, visitor):
+        visitor.visit_leaf_node(self)
 
 
 class BuilderState(ABC):
@@ -156,3 +162,49 @@ def get_pre_order_iterator(self):
     return PreOrderIterator(self)
 
 Node.get_pre_order_iterator = get_pre_order_iterator
+
+
+class Visitor(ABC):
+    """
+    Declara métodos de visita para cada tipo de elemento concreto.
+    """
+    @abstractmethod
+    def visit_decision_node(self, node):
+        pass
+
+    @abstractmethod
+    def visit_leaf_node(self, node):
+        pass
+
+
+class DepthVisitor(Visitor):
+    """
+    Calcula a profundidade (altura) da árvore.
+    """
+    def visit_decision_node(self, node):
+        print(f"Calculando profundidade em nó de decisão '{node.name}'.")
+        if not node.children:
+            return 1
+        
+        depths = [child.accept(self) for child in node.children]
+        return 1 + max(depths)
+
+    def visit_leaf_node(self, node):
+        print(f"Atingiu folha '{node.name}'.")
+        return 1
+
+
+class CountLeavesVisitor(Visitor):
+    """
+    Conta o número total de folhas na árvore.
+    """
+    def visit_decision_node(self, node):
+        print(f"Somando folhas a partir de '{node.name}'.")
+        total_leaves = 0
+        for child in node.children:
+            total_leaves += child.accept(self)
+        return total_leaves
+
+    def visit_leaf_node(self, node):
+        print(f"Folha encontrada: '{node.name}'.")
+        return 1
